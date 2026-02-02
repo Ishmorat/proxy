@@ -39,7 +39,7 @@ make
 cd build/
 ./proxy.out
 ```
-Подключаем клиента (вовдим пароль):
+Подключаем клиента (вводим пароль):
 ```bash
 psql -U postgres -d testdb -h 127.0.0.1 -p 5555 --set=sslmode=disable
 ```
