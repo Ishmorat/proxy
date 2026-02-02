@@ -17,6 +17,11 @@ cd build/
 ```bash
 psql -U <username> -d <database name> -h <proxy address> -p <proxy port> --set=sslmode=disable
 ```
+4. Для очистки:
+```bash
+cd ..
+make clean
+```
 ## Пример
 База данных:
 ```
@@ -38,4 +43,8 @@ cd build/
 ```bash
 psql -U postgres -d testdb -h 127.0.0.1 -p 5555 --set=sslmode=disable
 ```
-Отправляем запросы.
+Отправляем запросы:
+```sql
+SELECT * FROM test_users WHERE email = 'ivan@test.ru';
+```
+В файле логов появятся запросы.
