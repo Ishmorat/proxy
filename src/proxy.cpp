@@ -1,9 +1,19 @@
 #include "proxy.h"
 
 /*
+* Setup signal handler 
+*/
+void Proxy::setup_signals() {
+    std::signal(SIGINT, signal_handler);
+    std::signal(SIGTERM, signal_handler);
+}
+
+/*
 * Initializes the listening socket and adds it to epoll 
 */
 void Proxy::init() {
+    setup_signals();
+
     listener.check_validity();
     listener.set_reuseaddr();
     listener.bind(LOCALHOST.c_str(), cfg.port);
@@ -19,7 +29,7 @@ void Proxy::init() {
 * Handles a new client connection and connects it to the server 
 */
 void Proxy::handle_new_client() {
-    while (true) {
+    while (!should_stop()) {
         Socket client = listener.accept();
         if (!client.is_valid()) return;
         Socket server = Socket::connect(cfg.pg_addr.c_str(), cfg.pg_port);
@@ -61,7 +71,7 @@ void Proxy::handle_connection(const epoll_event& ev) {
     Socket& dst = is_client ? conn->server : conn->client;
 
     char buff[BUFFER_SIZE];
-    while (true) {
+    while (!should_stop()) {
         int recv_n = src.recv(buff, BUFFER_SIZE);
         if (recv_n == -1 && errno != EAGAIN || recv_n == 0) close_connection(conn);
         if (recv_n <= 0) break;
@@ -135,12 +145,13 @@ Proxy::Proxy(const Config& cfg_)
 
 void Proxy::run() {
     std::cout << "Running...\n";
-    while (true) {
+    while (!should_stop()) {
         int nfds = epoll.wait();
-        for (size_t i = 0; i < nfds; ++i) {
+        for (size_t i = 0; i < nfds && !should_stop(); ++i) {
             int fd = epoll[i].data.fd;
             if (fd == listener.get_fd()) handle_new_client();
             else                         handle_connection(epoll[i]);
         }
     }
+    std::cout << "Closed\n";
 }
