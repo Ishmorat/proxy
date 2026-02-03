@@ -9,6 +9,9 @@ namespace {
     constexpr int INVALID_FD = -1;
 }
 
+/*
+* RAII wraper for file descriptor 
+*/
 class FileDesc {
 protected:
     int fd;

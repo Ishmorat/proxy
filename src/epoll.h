@@ -4,6 +4,10 @@
 #include <vector>
 #include <sys/epoll.h>
 
+/*
+* RAII wraper for epoll 
+* For all methods it is necessary to check the error code after the call 
+*/
 class Epoll : public FileDesc {
 private:
     std::vector<epoll_event> events;

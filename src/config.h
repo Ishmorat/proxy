@@ -10,6 +10,9 @@ namespace {
     constexpr std::string   DEFAULT_LOG_FILE = "log.txt";
 }
 
+/*
+* Stores the program's input arguments 
+*/
 struct Config {
 public:
     int         port;

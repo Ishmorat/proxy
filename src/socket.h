@@ -9,6 +9,11 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 
+/*
+* RAII wraper for socket 
+* The bind and listen methods can throw exceptions, 
+* while for the others it is necessary to check the error code after the call 
+*/
 class Socket : public FileDesc {
 private:
     explicit Socket(int fd_ = INVALID_FD) noexcept;

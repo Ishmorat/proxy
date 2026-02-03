@@ -19,7 +19,7 @@ private:
     Socket      listener;
     Epoll       epoll;
     Logger      logger;
-    std::unordered_map<int, ConnPtr> conns;
+    std::unordered_map<int, ConnPtr> conns;                     // Stores pointers to connections in two instances: one for the client and the other for the server 
 private:
     void init();
     void handle_new_client();
@@ -28,7 +28,6 @@ private:
     void parse_and_log(ConnPtr conn, char* buff, size_t len) noexcept;
 public:
     Proxy(const Config& cfg_);
-    void print_all_conns();
     void run();
     ~Proxy() {}
 };

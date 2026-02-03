@@ -7,13 +7,16 @@ namespace {
     constexpr int   HEADER_SIZE = 5;
 }
 
+/*
+* Stores the connection sockets and request header information in the database 
+*/
 struct Connection {
 public:
     Socket  client;
     Socket  server;
-    char    header_type;
-    int     header_len;                     // Кол-во байт записанных в заголовок. Нужно, если вдруг заголовок будет разбит на несколько recv 
-    // char    header[HEADER_SIZE];            // Заголовок : Q + len 
+    char    header_type;                            // Q - query, \0 - undefined 
+    int     header_len;                             // The number of bytes written to the header. Needed in case the header is split across multiple recv calls 
+    // char    header[HEADER_SIZE];                 // Header : Q + len 
 public:
     Connection(Socket&& client_, Socket&& server_) noexcept
         : client       (std::move(client_))
@@ -39,7 +42,7 @@ public:
     //     return header[0];
     // }
 
-    // uint32_t get_remaining_len() const noexcept {       // Кол-во байт, которые еще нужно записать для запроса 
+    // uint32_t get_remaining_len() const noexcept {       // The number of bytes that still need to be written for the request 
     //     uint32_t len = chars_to_uint(header + 1);
     //     return len - HEADER_SIZE;
     // }

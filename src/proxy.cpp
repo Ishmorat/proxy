@@ -1,5 +1,8 @@
 #include "proxy.h"
 
+/*
+* Initializes the listening socket and adds it to epoll 
+*/
 void Proxy::init() {
     listener.check_validity();
     listener.set_reuseaddr();
@@ -12,6 +15,9 @@ void Proxy::init() {
     if (!success) throw std::runtime_error("Epoll add listener error");
 }
 
+/*
+* Handles a new client connection and connects it to the server 
+*/
 void Proxy::handle_new_client() {
     while (true) {
         Socket client = listener.accept();
@@ -19,7 +25,7 @@ void Proxy::handle_new_client() {
         Socket server = Socket::connect(cfg.pg_addr.c_str(), cfg.pg_port);
         if (!server.is_valid()) return;
 
-        client.set_nonblock();                                              // На всякий случай 
+        client.set_nonblock();                                              // Just in case 
         server.set_nonblock();
         
         bool success_c = epoll.add(client, EPOLLIN | EPOLLET | EPOLLHUP);
@@ -36,6 +42,9 @@ void Proxy::handle_new_client() {
     }
 }
 
+/*
+* Handles the event of one of the connection’s sockets 
+*/
 void Proxy::handle_connection(const epoll_event& ev) {
     int fd = ev.data.fd;
     auto it = conns.find(fd);
@@ -68,6 +77,9 @@ void Proxy::handle_connection(const epoll_event& ev) {
     }
 }
 
+/*
+* Closes the connections between the client and the server 
+*/
 void Proxy::close_connection(ConnPtr conn) {
     epoll.del(conn->client);
     epoll.del(conn->server);
@@ -76,6 +88,9 @@ void Proxy::close_connection(ConnPtr conn) {
     conns.erase(conn->server.get_fd());
 }
 
+/*
+* Parses the buffer and logs it if it is a query 
+*/
 void Proxy::parse_and_log(ConnPtr conn, char* buff, size_t len) noexcept {
     char* it = buff;
     char* end = buff + len;
