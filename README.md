@@ -17,7 +17,9 @@ cd build/
 ```bash
 psql -U <username> -d <database name> -h <proxy address> -p <proxy port> --set=sslmode=disable
 ```
-4. Для очистки:
+4. Для корректного завершения процесса обработаны сигналы SIGINT (^C) и SIGTERM (kill <pid>)
+   Добавил просто для завершения ПОСЛЕ всех запросов. Не тестировал случаи, когда завершаем во время общения клиентов и сервера
+5. Для очистки:
 ```bash
 cd ..
 make clean
